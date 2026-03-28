@@ -50,12 +50,13 @@ jobs:
           mkdir -p ~/out
           df -h
           sudo chown -R $USER:$USER ~/dist
-          tar -czvf ~/out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz -C ~/dist ${{ inputs.package }}-${{ inputs.version }} 
+          tar -czvf ~/out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz -C ~/dist  \
+           ${{ inputs.package }}-${{ inputs.version }} 
 
       - name: Upload  artifact
         uses: actions/upload-artifact@v6
         with:
            name: ${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}
-           path: out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz
+           path: ~/out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz
            if-no-files-found: error
            retention-days: 2
