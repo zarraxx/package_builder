@@ -26,7 +26,7 @@ if [ $VERSION == "gcc-11.5.0" ]; then
     TARGET='aarch64-unknown-linux419-gnu217 x86_64-unknown-linux310-gnu217'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-12.5.0" ]; then
-    TARGET='aarch64-unknown-linux419-gnu217-gcc12 '
+    TARGET='aarch64-unknown-linux419-gnu217-gcc12 x86_64-unknown-linux310-gnu217-gcc12'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-15.2.0" ]; then
     TARGET='aarch64-unknown-linux419-gnu228-gcc15 x86_64-unknown-linux310-gnu217-gcc15'

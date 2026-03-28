@@ -31,3 +31,5 @@ out/
 archive/
 */.build/
 .build/
+build.log
+.config.old
