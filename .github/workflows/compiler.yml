@@ -16,6 +16,7 @@ on:
         type: choice
         options:                      
           - gcc-11.5.0
+          - gcc-12.5.0
           - gcc-15.2.0
       deploy-body:
         description: '发布说明'     # 文本框上方的描述
