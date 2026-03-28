@@ -1,0 +1,59 @@
+# .github/workflows/reusable-build-linux.yml
+name: Reusable Matrix Build Linux Only
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      build_script:
+        required: false
+        type: string
+        default: "./build.sh"
+
+jobs:
+  build-all:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+        include:
+        - arch: x86_64
+          runs_on: ubuntu-latest
+        - arch: aarch64
+          runs_on: ubuntu-24.04-arm
+
+    runs-on: ${{ matrix.runs_on }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Show runner arch
+        run: |
+          uname -a
+          arch
+      - name: Cache source tarball
+        uses: actions/cache@v5
+        with:
+            path: ~/archive
+            key: source-public
+      - name: Build 
+        run: |
+          ls -lah ~/archive
+          ./build.sh ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/${{ inputs.package }}-${{ inputs.version }}
+      - name: Build Package
+        run: |
+          mkdir -p ~/out
+          tar -czvf ~/out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz -C ~/dist ${{ inputs.package }}-${{ inputs.version }} 
+
+      - name: Upload  artifact
+        uses: actions/upload-artifact@v6
+        with:
+           name: ${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}
+           path: out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz
+           if-no-files-found: error
+           retention-days: 2

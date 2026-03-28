@@ -1,0 +1,52 @@
+# .github/workflows/reusable-release.yml
+name: Reusable Release
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      deploy-body:
+        required: false
+        type: string
+        default: "Automated Release"
+      tag_name:
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 必须有写入权限才能发布
+    steps:
+      # 关键点：不写 name，直接下载所有 Artifacts
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-dist
+
+      - name: Display structure
+        run: ls -R all-dist
+
+      # 整理文件：把不同目录下的 tar.gz 汇总到一个文件夹，方便上传
+      - name: Prepare assets
+        run: |
+          mkdir -p upload-dir
+          find all-dist -name "*.tar.gz" -exec cp {} upload-dir/ \;
+
+      - name: Publish Release
+        uses: ncipollo/release-action@v1
+        with:
+          # 如果没传 tag_name，就用 package-version
+          tag: ${{ inputs.tag_name || format('{0}-{1}', inputs.package, inputs.version) }}
+          name: ${{ inputs.package }}-${{ inputs.version }}
+          body: ${{ inputs.deploy-body }}
+          artifacts: "upload-dir/*.tar.gz"
+          allowUpdates: true
+          replacesArtifacts: true
+          makeLatest: true

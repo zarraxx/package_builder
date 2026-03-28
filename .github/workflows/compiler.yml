@@ -52,77 +52,20 @@ jobs:
         mkdir -p ~/archive
         ./build.sh ${{ inputs.package }} ${{ inputs.version }} source ~/archive
   build-and-package:
-    needs:
-     - prepare-source
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: x86_64
-            runs_on: ubuntu-latest
-            package_suffix: linux-x86_64
-          - arch: aarch64
-            runs_on: ubuntu-24.04-arm
-            package_suffix: linux-aarch64
-    runs-on: ${{ matrix.runs_on }}
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v5
-      - name: Show runner arch
-        run: |
-          uname -a
-          arch
-      - name: Cache source tarball
-        uses: actions/cache@v5
-        with:
-            path: ~/archive
-            key: source-public
-      - name: Build 
-        run: |
-          ls -lah ~/archive
-          ./build.sh ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/${{ inputs.package }}-${{ inputs.version }}
-      - name: Build Package
-        run: |
-          mkdir -p ~/out
-          tar -czvf ~/out/${{ inputs.package }}-${{ inputs.version }}-${{ matrix.package_suffix }}.tar.gz -C ~/dist ${{ inputs.package }}-${{ inputs.version }} 
-          docker push ${IMAGE_NAME}
-
-      - name: Upload  artifact
-        uses: actions/upload-artifact@v6
-        with:
-           name: ${{ inputs.package }}-${{ inputs.version }}-${{ matrix.package_suffix }}
-           path: out/${{ inputs.package }}-${{ inputs.version }}-${{ matrix.package_suffix }}.tar.gz
-           if-no-files-found: error
-           retention-days: 2
+    uses: ./.github/workflows/reusable-build-linux.yml
+    with:
+      package: "${{ inputs.package }}"
+      version: ${{ inputs.version }}
+      build_script: "./build.sh"
 
   publish-release:
    needs:
      - prepare-source
      - build-and-package
-   runs-on: ubuntu-latest
-   steps:
-     - name: Download linux x64 artifact
-       uses: actions/download-artifact@v8
-       with:
-         name: ${{ inputs.package }}-${{ inputs.version }}-linux-x86_64
-         path: dist
-     - name: Download linux aarch64 artifact
-       uses: actions/download-artifact@v8
-       with:
-         name: ${{ inputs.package }}-${{ inputs.version }}-linux-aarch64
-         path: dist
- 
-     - name: Show downloaded files
-       run: ls -lah dist
-     - name: Publish Release
-       uses: ncipollo/release-action@v1
-       with:
-        #  tag: ${{ inputs.package }}-${{ inputs.version }}
-         name: ${{ inputs.package }}-${{ inputs.version }}
-         body: ${{ inputs.deploy-body }}
-         artifacts: "dist/*.tar.gz"
-         allowUpdates: true
-         replacesArtifacts: true
-         removeArtifacts: true
-         prerelease: false
-         makeLatest: false
+   permissions:
+      contents: write
+   uses: ./.github/workflows/reusable-release.yml
+   with:
+      package: "${{ inputs.package }}"
+      version: "${{ inputs.version }}"
+      deploy-body: "${{ inputs.deploy-body }}"
