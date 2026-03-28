@@ -29,3 +29,5 @@ build/
 dist/
 out/
 archive/
+*/.build/
+.build/

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+SCRIPT_PATH="${BASH_SOURCE[0]:-$0}"
+
+# 获取脚本所在的目录
+ROOT=$(cd "$(dirname "$SCRIPT_PATH")" && pwd)
+
+ARCH=${1:-$(uname -m)}
+
+export COMPILER_ROOT=$ROOT/${ARCH}-unknown-linux-gnu
+
+export PATH=$COMPILER_ROOT/bin:$PATH
+export CC=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-gcc
+export CXX=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-g++
+#export LD=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-ld
+export AR=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-ar
+export AS=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-as
+export RANLIB=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-ranlib
+export STRIP=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-strip
+export NM=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-nm
+export OBJCOPY=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-objcopy
+export OBJDUMP=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-objdump
+export READELF=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-readelf
+export SIZE=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-size
+export STRINGS=$COMPILER_ROOT/bin/${ARCH}-unknown-linux-gnu-strings
