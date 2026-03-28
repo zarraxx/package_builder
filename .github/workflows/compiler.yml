@@ -52,6 +52,8 @@ jobs:
         mkdir -p ~/archive
         ./build.sh ${{ inputs.package }} ${{ inputs.version }} source ~/archive
   build-and-package:
+    needs:
+     - prepare-source
     uses: ./.github/workflows/reusable-build-linux.yml
     with:
       package: "${{ inputs.package }}"
