@@ -14,7 +14,7 @@ echo "Building package: $BASE_NAME"
 VERSION="${1:-"gcc-11.5.0"}"
 ARCHIVE_DIR="${2:-"$ROOT/archive"}"
 BUILD_DIR="${3:-"$ROOT/build"}/$BASE_NAME/$VERSION"
-DEST_DIR="${4:-"$ROOT/dist"}/$BASE_NAME/$VERSION"
+DEST_DIR="${4:-"$ROOT/dist"}/"
 COMMAND="${5:-"build"}"
 
 mkdir -p $ARCHIVE_DIR

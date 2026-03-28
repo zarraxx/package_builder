@@ -48,6 +48,8 @@ jobs:
       - name: Build Package
         run: |
           mkdir -p ~/out
+          df -h
+          sudo chown -R $USER:$USER ~/dist
           tar -czvf ~/out/${{ inputs.package }}-${{ inputs.version }}-linux-${{ matrix.arch }}.tar.gz -C ~/dist ${{ inputs.package }}-${{ inputs.version }} 
 
       - name: Upload  artifact
