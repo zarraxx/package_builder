@@ -17,6 +17,7 @@ BUILD_DIR="${3:-"$ROOT/build"}/$BASE_NAME/$VERSION"
 DEST_DIR="${4:-"$ROOT/dist"}/"
 COMMAND="${5:-"build"}"
 
+echo "Building version: $VERSION"
 mkdir -p $ARCHIVE_DIR
 mkdir -p $BUILD_DIR
 mkdir -p $DEST_DIR
@@ -24,8 +25,8 @@ mkdir -p $DEST_DIR
 if [ $VERSION == "gcc-11.5.0" ]; then
     TARGET='aarch64-unknown-linux419-gnu217 x86_64-unknown-linux310-gnu217'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
-elif [ $VERSION == "gcc-14.3.0" ]; then
-    TARGET='aarch64-unknown-linux419-gnu217-gcc14 '
+elif [ $VERSION == "gcc-12.5.0" ]; then
+    TARGET='aarch64-unknown-linux419-gnu217-gcc12 '
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-15.2.0" ]; then
     TARGET='aarch64-unknown-linux419-gnu228-gcc15 x86_64-unknown-linux310-gnu217-gcc15'
