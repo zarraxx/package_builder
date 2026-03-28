@@ -25,7 +25,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   prepare-source:
    runs-on: ubuntu-latest
@@ -52,6 +52,8 @@ jobs:
         mkdir -p ~/archive
         ./build ${{ inputs.package }} ${{ inputs.version }} source ~/archive
   build-and-package:
+    needs:
+     - prepare-source
     strategy:
       fail-fast: false
       matrix:
