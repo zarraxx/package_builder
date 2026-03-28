@@ -3,6 +3,13 @@ name: Build Compiler
 on:
   workflow_dispatch: # 开启手动触发
     inputs:
+      package:
+        description: '构建包类型'
+        required: true
+        type: choice
+        options:
+          - compiler
+
       version:
         description: '构建版本'
         required: true
@@ -10,11 +17,109 @@ on:
         options:                      
           - gcc-11.5.0
           - gcc-15.2.0
+      deploy-body:
+        description: '发布说明'     # 文本框上方的描述
+        required: true                # 是否必填
+        default: '常规版本发布'              # 默认值
+        type: string                  # 类型：字符串
 
+permissions:
+  contents: write
+  
 jobs:
-  display-params:
-    runs-on: ubuntu-latest
+  prepare-source:
+   runs-on: ubuntu-latest
+   outputs:
+      version: ${{ steps.get_version.outputs.version }}
+   steps:
+    - uses: actions/checkout@v5
+    - name: Load version into env
+      id: get_version
+      run: |
+        VERSION="${{ inputs.version }}"
+        PACKAGE="${{ inputs.package }}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+    - name: Cache source tarball
+      uses: actions/cache@v5
+      with:
+            path: ~/archive
+            key: source-public
+    - name: Download source tarball
+      run: |
+        mkdir -p ~/archive
+        ./build ${{ inputs.package }} ${{ inputs.version }} source ~/archive
+  build-and-package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runs_on: ubuntu-latest
+            package_suffix: linux-x86_64
+          - arch: aarch64
+            runs_on: ubuntu-24.04-arm
+            package_suffix: linux-aarch64
+    runs-on: ${{ matrix.runs_on }}
     steps:
-      - name: 使用手动输入的参数
+      - name: Checkout source
+        uses: actions/checkout@v5
+      - name: Show runner arch
         run: |
-          echo "构建版本: ${{ inputs.version }}"
+          uname -a
+          arch
+      - name: Cache source tarball
+        uses: actions/cache@v5
+        with:
+            path: ~/archive
+            key: source-public
+      - name: Build 
+        run: |
+          ./build ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/${{ inputs.package }}-${{ inputs.version }}
+      - name: Build Package
+        run: |
+          mkdir -p ~/out
+          tar -czvf ~/out/${{ inputs.package }}-${{ inputs.version }}-${{ matrix.package_suffix }}.tar.gz -C ~/dist ${{ inputs.package }}-${{ inputs.version }} 
+          docker push ${IMAGE_NAME}
+
+      - name: Upload  artifact
+        uses: actions/upload-artifact@v6
+        with:
+           name: ${{ inputs.package }}-${{ inputs.version }}-${{ matrix.package_suffix }}
+           path: out/${{ inputs.package }}-${{ inputs.version }}-${{ matrix.package_suffix }}.tar.gz
+           if-no-files-found: error
+           retention-days: 2
+
+  publish-release:
+   needs:
+     - prepare-source
+     - build-and-package
+   runs-on: ubuntu-latest
+   steps:
+     - name: Download linux x64 artifact
+       uses: actions/download-artifact@v8
+       with:
+         name: ${{ inputs.package }}-${{ inputs.version }}-linux-x86_64
+         path: dist
+     - name: Download linux aarch64 artifact
+       uses: actions/download-artifact@v8
+       with:
+         name: ${{ inputs.package }}-${{ inputs.version }}-linux-aarch64
+         path: dist
+ 
+     - name: Show downloaded files
+       run: ls -lah dist
+     - name: Publish Release
+       uses: ncipollo/release-action@v1
+       with:
+        #  tag: ${{ inputs.package }}-${{ inputs.version }}
+         name: ${{ inputs.package }}-${{ inputs.version }}
+         body: ${{ inputs.deploy-body }}
+         artifacts: "dist/*.tar.gz"
+         allowUpdates: true
+         replacesArtifacts: true
+         removeArtifacts: true
+         prerelease: false
+         makeLatest: false
