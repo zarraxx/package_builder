@@ -26,7 +26,7 @@ jobs:
     steps:
       # 关键点：不写 name，直接下载所有 Artifacts
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: all-dist
 
