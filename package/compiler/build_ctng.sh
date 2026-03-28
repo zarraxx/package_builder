@@ -39,16 +39,17 @@ fi
 
 
 set -x
-podman run -it --rm --name=$NAME  \
-        --userns=keep-id \
-        -e LINES=50 -e COLUMNS=160 \
-        -e CT_PREFIX=/opt/x-tools/compilers \
-        -e CTNG_COMMAND="${COMMAND}" \
-        -v $CTNG_HOME/:/home/ctng:z,U \
-        -v $WORKSPACE/:/home/ctng/workspace:z,U \
-        -v $ARCHIVE_DIR/:/home/ctng/src:z,U \
-        -v $DEST_DIR/:/opt/x-tools/compilers:z,U \
-        -v $ROOT/example/:/example:z,U \
-        -v $ROOT/script:/script:z,U \
-    	$IMAGE /bin/bash  "${CMD_ARGS[@]}"
+# podman run -it --rm --name=$NAME  \
+#         --userns=keep-id \
+#         -e LINES=50 -e COLUMNS=160 \
+#         -e CT_PREFIX=/opt/x-tools/compilers \
+#         -e CTNG_COMMAND="${COMMAND}" \
+#         -v $CTNG_HOME/:/home/ctng:z,U \
+#         -v $WORKSPACE/:/home/ctng/workspace:z,U \
+#         -v $ARCHIVE_DIR/:/home/ctng/src:z,U \
+#         -v $DEST_DIR/:/opt/x-tools/compilers:z,U \
+#         -v $ROOT/example/:/example:z,U \
+#         -v $ROOT/script:/script:z,U \
+#     	$IMAGE /bin/bash  "${CMD_ARGS[@]}"
 
+touch $DEST_DIR/dummy.txt
