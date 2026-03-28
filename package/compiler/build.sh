@@ -24,12 +24,16 @@ mkdir -p $DEST_DIR
 if [ $VERSION == "gcc-11.5.0" ]; then
     TARGET='aarch64-unknown-linux419-gnu217 x86_64-unknown-linux310-gnu217'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
+elif [ $VERSION == "gcc-14.3.0" ]; then
+    TARGET='aarch64-unknown-linux419-gnu217-gcc14 '
+    $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-15.2.0" ]; then
+    TARGET='aarch64-unknown-linux419-gnu228-gcc15 x86_64-unknown-linux310-gnu217-gcc15'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "llvm-7.1.0" ]; then
     $ROOT/build_llvm71.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
-elif [ $VERSION == "llvm-15" ]; then
-    $ROOT/build_llvm.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
+elif [ $VERSION == "llvm-15.0.7" ]; then
+    $ROOT/build_llvm.sh "15.0.7" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "ctng" ]; then
     $ROOT/build_ctng.sh "ctng" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 else

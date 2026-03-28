@@ -5,8 +5,14 @@ ROOT=$(cd `dirname $0` && pwd)
 
 export LLVM_VERSION=${1:-"15.0.7"}
 
+yum install -y \
+    devtoolset-10-gcc \
+    devtoolset-10-gcc-c++ \
+    devtoolset-10-binutils \
+    && yum clean all
+
 source /opt/rh/rh-python38/enable
-#source /opt/rh/devtoolset-10/enable
+source /opt/rh/devtoolset-10/enable
 
 
 export BUILD_DIR=/workspace/build

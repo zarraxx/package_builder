@@ -18,17 +18,15 @@ fi
 
 DOCKER=${DOCKER:-podman}
 
-ARCHIVE_DIR=$ROOT/archive
-WORKSPACE=$ROOT/build
-DEST_DIR=$ROOT/dist
-OUTPUT_DIR=$ROOT/out
+LLVM_VERSION="${1:-"15.0.7"}"
+ARCHIVE_DIR="${2:-"$ROOT/archive"}"
+BUILD_DIR="${3:-"$ROOT/build"}"
+DEST_DIR="${4:-"$ROOT/dist"}"
+COMMAND="${5:-"build"}"
+
 
 mkdir -p $ARCHIVE_DIR
-mkdir -p $DEST_DIR
-mkdir -p $OUTPUT_DIR
-rm -rf $WORKSPACE
-#rm -rf "$DEST_DIR"
-mkdir -p $WORKSPACE
+mkdir -p $BUILD_DIR
 mkdir -p "$DEST_DIR"
 
 DOCKER=${DOCKER:-podman}
@@ -37,7 +35,7 @@ DOCKER=${DOCKER:-podman}
 
 $DOCKER run -it --rm --name=$NAME  \
         -e LINES=50 -e COLUMNS=160 \
-        -v $WORKSPACE:/workspace/build:z,U \
+        -v $BUILD_DIR:/workspace/build:z,U \
         -v $ARCHIVE_DIR:/workspace/archive:z,U \
         -v $DEST_DIR:/opt/x-tools/compilers:z,U \
         -v $ROOT/script:/script:z,U \
