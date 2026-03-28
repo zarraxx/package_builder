@@ -79,6 +79,7 @@ jobs:
             key: source-public
       - name: Build 
         run: |
+          ls -lah ~/archive
           ./build.sh ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/${{ inputs.package }}-${{ inputs.version }}
       - name: Build Package
         run: |
