@@ -50,7 +50,7 @@ jobs:
     - name: Download source tarball
       run: |
         mkdir -p ~/archive
-        ./build ${{ inputs.package }} ${{ inputs.version }} source ~/archive
+        ./build.sh ${{ inputs.package }} ${{ inputs.version }} source ~/archive
   build-and-package:
     needs:
      - prepare-source
@@ -79,7 +79,7 @@ jobs:
             key: source-public
       - name: Build 
         run: |
-          ./build ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/${{ inputs.package }}-${{ inputs.version }}
+          ./build.sh ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/${{ inputs.package }}-${{ inputs.version }}
       - name: Build Package
         run: |
           mkdir -p ~/out
