@@ -21,6 +21,8 @@ on:
           - mingw32-gcc-15.2.0
           - llvm-15.0.7
           - llvm-16.0.6
+          - llvm-17.0.6
+          - llvm-18.1.8
       deploy-body:
         description: '发布说明'     # 文本框上方的描述
         required: true                # 是否必填
