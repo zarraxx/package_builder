@@ -23,18 +23,27 @@ DEST_DIR="${4:-"$ROOT/dist"}"
 COMMAND="${5:-"build"}"
 
 
-mkdir -p $ARCHIVE_DIR
-mkdir -p $BUILD_DIR
-mkdir -p "$DEST_DIR"
-
-DOCKER=${DOCKER:-podman}
 
 
+if [ "$COMMAND" == "build" ]; then
+    echo "Building LLVM ${LLVM_VERSION}..."
 
-$DOCKER run -it --rm --name=$NAME  \
-        -e LINES=50 -e COLUMNS=160 \
-        -v $BUILD_DIR:/workspace/build:z,U \
-        -v $ARCHIVE_DIR:/workspace/archive:z,U \
-        -v $DEST_DIR:/opt/x-tools/compilers:z,U \
-        -v $ROOT/script:/script:z,U \
-    	$IMAGE /bin/bash -c "/script/$SCRIPT $LLVM_VERSION"
+    mkdir -p $ARCHIVE_DIR
+    mkdir -p $BUILD_DIR
+    mkdir -p "$DEST_DIR"
+
+    DOCKER=${DOCKER:-podman}
+
+
+
+    $DOCKER run -it --rm --name=$NAME  \
+            -e LINES=50 -e COLUMNS=160 \
+            -v $BUILD_DIR:/workspace/build:z,U \
+            -v $ARCHIVE_DIR:/workspace/archive:z,U \
+            -v $DEST_DIR:/opt/x-tools/compilers:z,U \
+            -v $ROOT/script:/script:z,U \
+            $IMAGE /bin/bash -c "/script/$SCRIPT $LLVM_VERSION"
+else
+    echo "Unsupported command: $COMMAND"
+    exit 0
+fi
