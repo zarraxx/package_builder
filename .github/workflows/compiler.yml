@@ -18,6 +18,8 @@ on:
           - gcc-11.5.0
           - gcc-12.5.0
           - gcc-15.2.0
+          - mingw32-gcc-15.2.0
+          - llvm-15.0.7
       deploy-body:
         description: '发布说明'     # 文本框上方的描述
         required: true                # 是否必填

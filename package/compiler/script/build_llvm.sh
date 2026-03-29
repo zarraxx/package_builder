@@ -2,6 +2,7 @@
 
 set -e
 ROOT=$(cd `dirname $0` && pwd)
+ARCH=`uname -m`
 
 export LLVM_VERSION=${1:-"15.0.7"}
 
@@ -23,7 +24,7 @@ mkdir -p ${BUILD_DIR}
 mkdir -p ${ARCHIVE_DIR}
 
 
-export PATH=${DEST_DIR}/bin:$PATH
+export PATH=/opt/x-tools/utils/bin:$PATH
 
 download_file_llvm() {
     local filename=llvm-project-${LLVM_VERSION}.src.tar.xz
@@ -54,50 +55,137 @@ build_llvm(){
     tar xf $ARCHIVE_DIR/llvm-project-$LLVM_VERSION.src.tar.xz
     PYTHON_EXE=$(which python3)
     cd llvm-project-$LLVM_VERSION.src
-    rm -rf _build && mkdir _build && cd _build
-    cmake -G Ninja \
-     -DCMAKE_BUILD_TYPE=Release \
-      -DPython3_EXECUTABLE=$PYTHON_EXE \
-      -DCMAKE_INSTALL_PREFIX=${LLVM_DEST_DIR} \
-      \
-      -DLLVM_ENABLE_PROJECTS="clang;lld" \
-      -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;compiler-rt" \
-      -DCLANG_DEFAULT_LINKER="lld" \
-      \
-      -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
-      \
-      -DLLVM_ENABLE_RTTI=ON \
-      -DLLVM_INSTALL_UTILS=ON \
-      -DLLVM_BUILD_LLVM_DYLIB=ON \
-      -DLLVM_LINK_LLVM_DYLIB=ON \
-      -DCLANG_LINK_CLANG_DYLIB=ON \
-      \
-      -DLLVM_INCLUDE_TESTS=OFF \
-      -DLLVM_INCLUDE_EXAMPLES=OFF \
-      -DLLVM_ENABLE_TERMINFO=OFF \
-      -DLLVM_ENABLE_ZLIB=ON \
-      -DLLVM_ENABLE_LIBXML2=OFF \
-      \
-      -DCOMPILER_RT_BUILD_BUILTINS=ON \
-      -DCOMPILER_RT_BUILD_SANITIZERS=ON \
-      -DCOMPILER_RT_ENABLE_STATIC_HELPER=ON \
-      \
-      \
-      -DCMAKE_INSTALL_RPATH="\$ORIGIN;\$ORIGIN/../lib" \
-      -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
-       ../llvm
 
-    #   -DCLANG_DEFAULT_RTLIB="compiler-rt" \
-    #   -DCLANG_DEFAULT_UNWINDLIB="libunwind" \
-    #   -DLIBCXX_USE_COMPILER_RT=ON \
+    LLVM_SRC=$(pwd)/llvm
+    STAGE1_DIR=$BUILD_DIR/llvm-stage1
+    STAGE1_INSTALL=$BUILD_DIR/llvm-${LLVM_VERSION}-stage1
 
-    ninja -j$(nproc) 
-    ninja install
+    echo "Building LLVM ${LLVM_VERSION} stage 1..."
+    cmake -G Ninja -S $LLVM_SRC -B $STAGE1_DIR \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
+    -DLLVM_TARGETS_TO_BUILD="Native" \
+    -DCMAKE_INSTALL_PREFIX=$STAGE1_INSTALL \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_BUILD_LLVM_DYLIB=OFF \
+    -DLLVM_LINK_LLVM_DYLIB=OFF
+
+    ninja -C $STAGE1_DIR -j$(nproc)
+    ninja -C $STAGE1_DIR install
+
+
+
+    echo "Building LLVM ${LLVM_VERSION} stage 2..."
+    STAGE2_DIR=$BUILD_DIR/llvm-stage2
+    LLVM_DEST_DIR=/opt/x-tools/compilers/llvm-${LLVM_VERSION}
+
+   DETECTED_FILE=$(find "$STAGE1_INSTALL/lib" \
+    \( -name "libc++.so" -o -name "libc++.dylib" -o -name "libc++.dll" \) \
+    | head -n 1)
+
+    if [ -n "$DETECTED_FILE" ]; then
+        DETECTED_LIB_DIR=$(dirname "$DETECTED_FILE")
+    fi
+
+    if [ -z "$DETECTED_LIB_DIR" ]; then
+        echo "FATAL: Cannot find libc++.so in $STAGE1_INSTALL/lib"
+        exit 1
+    fi
+
+    echo "Detected libc shared library directory: $DETECTED_LIB_DIR"
+
+    STAGE2_LIBCXX_DIR="$(basename "$DETECTED_LIB_DIR")"
+
+    echo "Final will use libc++ from: $STAGE2_LIBCXX_DIR"
+
+    export STAGE1_LIB_DIR="$DETECTED_LIB_DIR"
+    export LD_LIBRARY_PATH="$STAGE1_LIB_DIR:$LD_LIBRARY_PATH"
+    export LDFLAGS="-L$STAGE1_LIB_DIR $LDFLAGS"
+
+    cmake -G Ninja $LLVM_SRC -B $STAGE2_DIR \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$LLVM_DEST_DIR \
+    \
+    -DCMAKE_C_COMPILER=$STAGE1_INSTALL/bin/clang \
+    -DCMAKE_CXX_COMPILER=$STAGE1_INSTALL/bin/clang++ \
+    -DCMAKE_LINKER=$STAGE1_INSTALL/bin/ld.lld \
+    -DCMAKE_BUILD_RPATH="$STAGE1_INSTALL/lib/$ARCH-unknown-linux-gnu" \
+    \
+    -DLLVM_ENABLE_PROJECTS="clang;lld;clang-tools-extra" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
+    -DCLANG_DEFAULT_LINKER="lld" \
+    \
+    -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DCLANG_LINK_CLANG_DYLIB=ON \
+    \
+    -DLLVM_ENABLE_LIBCXX=ON \
+    -DCLANG_DEFAULT_CXX_STDLIB="libc++" \
+    -DCLANG_DEFAULT_RTLIB="compiler-rt" \
+    -DCLANG_DEFAULT_UNWINDLIB="libunwind" \
+    -DLIBCXX_USE_COMPILER_RT=ON \
+    -DLIBCXXABI_USE_COMPILER_RT=ON \
+    -DLIBCXXABI_USE_LLVM_UNWIND=ON \
+    \
+    -DCMAKE_INSTALL_RPATH='$ORIGIN;$ORIGIN/../lib;$ORIGIN/../lib/'"${STAGE2_LIBCXX_DIR}" \
+    -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+    -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF \
+    \
+    -DLLVM_TARGETS_TO_BUILD="X86;AArch64;RISCV" \
+    -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD="WebAssembly;LoongArch" \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_INSTALL_UTILS=ON \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    \
+    -DCMAKE_EXE_LINKER_FLAGS="-rtlib=compiler-rt --unwindlib=libunwind -stdlib=libc++" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-rtlib=compiler-rt --unwindlib=libunwind -stdlib=libc++"
+
+    ninja -C $STAGE2_DIR -j$(nproc)
+    ninja -C $STAGE2_DIR install
+
+    # rm -rf _build && mkdir _build && cd _build
+    # cmake -G Ninja \
+    #  -DCMAKE_BUILD_TYPE=Release \
+    #   -DPython3_EXECUTABLE=$PYTHON_EXE \
+    #   -DCMAKE_INSTALL_PREFIX=${LLVM_DEST_DIR} \
+    #   \
+    #   -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    #   -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;compiler-rt" \
+    #   -DCLANG_DEFAULT_LINKER="lld" \
+    #   \
+    #   -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
+    #   \
+    #   -DLLVM_ENABLE_RTTI=ON \
+    #   -DLLVM_INSTALL_UTILS=ON \
+    #   -DLLVM_BUILD_LLVM_DYLIB=ON \
+    #   -DLLVM_LINK_LLVM_DYLIB=ON \
+    #   -DCLANG_LINK_CLANG_DYLIB=ON \
+    #   \
+    #   -DLLVM_INCLUDE_TESTS=OFF \
+    #   -DLLVM_INCLUDE_EXAMPLES=OFF \
+    #   -DLLVM_ENABLE_TERMINFO=OFF \
+    #   -DLLVM_ENABLE_ZLIB=ON \
+    #   -DLLVM_ENABLE_LIBXML2=OFF \
+    #   \
+    #   -DCOMPILER_RT_BUILD_BUILTINS=ON \
+    #   -DCOMPILER_RT_BUILD_SANITIZERS=ON \
+    #   -DCOMPILER_RT_ENABLE_STATIC_HELPER=ON \
+    #   \
+    #   \
+    #   -DCMAKE_INSTALL_RPATH="\$ORIGIN;\$ORIGIN/../lib" \
+    #   -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+    #    ../llvm
+
+    # ninja -j$(nproc) 
+    # ninja install
 
 
 }
 
 
 
-export LLVM_DEST_DIR=/opt/x-tools/compilers/llvm-${LLVM_VERSION}
 build_llvm

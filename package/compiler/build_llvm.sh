@@ -6,8 +6,6 @@ IMAGE=registry.cn-hangzhou.aliyuncs.com/zarra/centos:x-tools-base
 ROOT="$(cd $(dirname "$(realpath "$0")");pwd)"
 ARCH=`uname -m`
 
-LLVM_VERSION=${1:-"7.1.0"}
-
 if [ "$LLVM_VERSION" == "7.1.0" ]; then
     SCRIPT="build_llvm71.sh"
 else

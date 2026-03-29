@@ -31,6 +31,9 @@ elif [ $VERSION == "gcc-12.5.0" ]; then
 elif [ $VERSION == "gcc-15.2.0" ]; then
     TARGET='aarch64-unknown-linux419-gnu228-gcc15 x86_64-unknown-linux310-gnu217-gcc15'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
+elif [ $VERSION == "mingw32-gcc-15.2.0" ]; then
+    TARGET='x86_64-w64-mingw32-gcc15'
+    $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "llvm-7.1.0" ]; then
     $ROOT/build_llvm71.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "llvm-15.0.7" ]; then
