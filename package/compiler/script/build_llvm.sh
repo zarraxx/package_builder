@@ -140,7 +140,7 @@ build_llvm(){
     -DRUNTIMES_CMAKE_SHARED_LINKER_FLAGS="-nostdlib++ -rtlib=compiler-rt" \
     -DRUNTIMES_CMAKE_EXE_LINKER_FLAGS="-nostdlib++ -rtlib=compiler-rt" \
     \
-    -DCMAKE_INSTALL_RPATH='$ORIGIN;$ORIGIN/../lib;$ORIGIN/../lib/'"${STAGE2_LIBCXX_DIR}" \
+    -DCMAKE_INSTALL_RPATH='$ORIGIN;$ORIGIN/../lib;''$ORIGIN/'"${STAGE2_LIBCXX_DIR};"'$ORIGIN/../lib/'"${STAGE2_LIBCXX_DIR}" \
     -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
     -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF \
     \
