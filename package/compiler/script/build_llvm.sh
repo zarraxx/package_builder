@@ -58,23 +58,23 @@ build_llvm(){
 
     LLVM_SRC=$(pwd)/llvm
     STAGE1_DIR=$BUILD_DIR/llvm-stage1
-    #STAGE1_INSTALL=$BUILD_DIR/llvm-${LLVM_VERSION}-stage1
-    STAGE1_INSTALL=/opt/x-tools/compilers/llvm-${LLVM_VERSION}-stage1
+    STAGE1_INSTALL=$BUILD_DIR/llvm-${LLVM_VERSION}-stage1
+    #STAGE1_INSTALL=/opt/x-tools/compilers/llvm-${LLVM_VERSION}-stage1
 
 
     echo "Building LLVM ${LLVM_VERSION} stage 1..."
-    # cmake -G Ninja -S $LLVM_SRC -B $STAGE1_DIR \
-    # -DCMAKE_BUILD_TYPE=Release \
-    # -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    # -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
-    # -DLLVM_TARGETS_TO_BUILD="Native" \
-    # -DCMAKE_INSTALL_PREFIX=$STAGE1_INSTALL \
-    # -DLLVM_INCLUDE_TESTS=OFF \
-    # -DLLVM_BUILD_LLVM_DYLIB=OFF \
-    # -DLLVM_LINK_LLVM_DYLIB=OFF
+    cmake -G Ninja -S $LLVM_SRC -B $STAGE1_DIR \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
+    -DLLVM_TARGETS_TO_BUILD="Native" \
+    -DCMAKE_INSTALL_PREFIX=$STAGE1_INSTALL \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_BUILD_LLVM_DYLIB=OFF \
+    -DLLVM_LINK_LLVM_DYLIB=OFF
 
-    # ninja -C $STAGE1_DIR -j$(nproc)
-    # ninja -C $STAGE1_DIR install
+    ninja -C $STAGE1_DIR -j$(nproc)
+    ninja -C $STAGE1_DIR install
 
 
 
