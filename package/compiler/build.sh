@@ -38,6 +38,8 @@ elif [ $VERSION == "llvm-7.1.0" ]; then
     $ROOT/build_llvm71.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "llvm-15.0.7" ]; then
     $ROOT/build_llvm.sh "15.0.7" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
+elif [ $VERSION == "llvm-16.0.6" ]; then
+    $ROOT/build_llvm.sh "16.0.6" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "ctng" ]; then
     $ROOT/build_ctng.sh "ctng" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 else

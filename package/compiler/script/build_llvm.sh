@@ -10,6 +10,7 @@ yum install -y \
     devtoolset-10-gcc \
     devtoolset-10-gcc-c++ \
     devtoolset-10-binutils \
+    zlib-devel lz4-devel bzip2-devel xz-devel \
     && yum clean all
 
 source /opt/rh/rh-python38/enable
@@ -163,6 +164,7 @@ build_llvm(){
     -DLLVM_INCLUDE_TESTS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_ENABLE_ZSTD=ON \
     -DLLVM_ENABLE_TERMINFO=OFF \
     \
     -DCMAKE_EXE_LINKER_FLAGS="-rtlib=compiler-rt --unwindlib=libunwind -stdlib=libc++" \
