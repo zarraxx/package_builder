@@ -58,21 +58,23 @@ build_llvm(){
 
     LLVM_SRC=$(pwd)/llvm
     STAGE1_DIR=$BUILD_DIR/llvm-stage1
-    STAGE1_INSTALL=$BUILD_DIR/llvm-${LLVM_VERSION}-stage1
+    #STAGE1_INSTALL=$BUILD_DIR/llvm-${LLVM_VERSION}-stage1
+    STAGE1_INSTALL=/opt/x-tools/compilers/llvm-${LLVM_VERSION}-stage1
+
 
     echo "Building LLVM ${LLVM_VERSION} stage 1..."
-    cmake -G Ninja -S $LLVM_SRC -B $STAGE1_DIR \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
-    -DLLVM_TARGETS_TO_BUILD="Native" \
-    -DCMAKE_INSTALL_PREFIX=$STAGE1_INSTALL \
-    -DLLVM_INCLUDE_TESTS=OFF \
-    -DLLVM_BUILD_LLVM_DYLIB=OFF \
-    -DLLVM_LINK_LLVM_DYLIB=OFF
+    # cmake -G Ninja -S $LLVM_SRC -B $STAGE1_DIR \
+    # -DCMAKE_BUILD_TYPE=Release \
+    # -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    # -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
+    # -DLLVM_TARGETS_TO_BUILD="Native" \
+    # -DCMAKE_INSTALL_PREFIX=$STAGE1_INSTALL \
+    # -DLLVM_INCLUDE_TESTS=OFF \
+    # -DLLVM_BUILD_LLVM_DYLIB=OFF \
+    # -DLLVM_LINK_LLVM_DYLIB=OFF
 
-    ninja -C $STAGE1_DIR -j$(nproc)
-    ninja -C $STAGE1_DIR install
+    # ninja -C $STAGE1_DIR -j$(nproc)
+    # ninja -C $STAGE1_DIR install
 
 
 
@@ -121,12 +123,22 @@ build_llvm(){
     -DCLANG_LINK_CLANG_DYLIB=ON \
     \
     -DLLVM_ENABLE_LIBCXX=ON \
+    \
     -DCLANG_DEFAULT_CXX_STDLIB="libc++" \
     -DCLANG_DEFAULT_RTLIB="compiler-rt" \
     -DCLANG_DEFAULT_UNWINDLIB="libunwind" \
+    \
+    -DLIBUNWIND_USE_COMPILER_RT=ON\
     -DLIBCXX_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWIND=ON \
+    -DRUNTIMES_LIBUNWIND_USE_COMPILER_RT=ON \
+    -DRUNTIMES_LIBUNWIND_HAS_GCC_S_LIB=OFF \
+    -DRUNTIMES_LIBCXXABI_USE_COMPILER_RT=ON \
+    -DRUNTIMES_LIBCXXABI_USE_LLVM_UNWIND=ON \
+    -DRUNTIMES_LIBCXX_USE_COMPILER_RT=ON \
+    -DRUNTIMES_CMAKE_SHARED_LINKER_FLAGS="-nostdlib++ -rtlib=compiler-rt" \
+    -DRUNTIMES_CMAKE_EXE_LINKER_FLAGS="-nostdlib++ -rtlib=compiler-rt" \
     \
     -DCMAKE_INSTALL_RPATH='$ORIGIN;$ORIGIN/../lib;$ORIGIN/../lib/'"${STAGE2_LIBCXX_DIR}" \
     -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
