@@ -23,13 +23,20 @@ mkdir -p $BUILD_DIR
 mkdir -p $DEST_DIR
 
 if [ $VERSION == "gcc-11.5.0" ]; then
-    TARGET='aarch64-unknown-linux419-gnu217 x86_64-unknown-linux310-gnu217'
+    TARGET='aarch64-unknown-linux-gnu-gcc11 x86_64-unknown-linux-gnu-gcc11'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-12.5.0" ]; then
-    TARGET='aarch64-unknown-linux419-gnu217-gcc12 x86_64-unknown-linux310-gnu217-gcc12'
+    TARGET='aarch64-unknown-linux-gnu-gcc12 x86_64-unknown-linux-gnu-gcc12'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-15.2.0" ]; then
-    TARGET='aarch64-unknown-linux419-gnu228-gcc15 x86_64-unknown-linux310-gnu217-gcc15'
+    #TARGET='aarch64-unknown-linux-gnu-gcc15 x86_64-unknown-linux-gnu-gcc15 loongarch64-unknown-linux-gnu-gcc15 riscv64-unknown-linux-gnu-gcc15'
+    TARGET='aarch64-unknown-linux-gnu-gcc15 x86_64-unknown-linux-gnu-gcc15'
+    $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
+elif [ $VERSION == "loongarch64-gcc-15.2.0" ]; then
+    TARGET='loongarch64-unknown-linux-gnu-gcc15'
+    $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
+elif [ $VERSION == "riscv64-gcc-15.2.0" ]; then
+    TARGET='riscv64-unknown-linux-gnu-gcc15'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "mingw32-gcc-15.2.0" ]; then
     TARGET='x86_64-w64-mingw32-gcc15'

@@ -18,6 +18,8 @@ on:
           - gcc-11.5.0
           - gcc-12.5.0
           - gcc-15.2.0
+          - loongarch64-gcc-15.2.0
+          - riscv64-gcc-15.2.0
           - mingw32-gcc-15.2.0
           - llvm-15.0.7
           - llvm-16.0.6
