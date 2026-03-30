@@ -33,3 +33,13 @@ archive/
 .build/
 build.log
 .config.old
+a.out
+*.out
+*.o
+*.so
+*.a
+*.dll
+*.dylib
+*.log
+*.tmp
+*.cache
