@@ -2,16 +2,36 @@
   "deps": [
     {
       "name": "gcc",
-      "version": "15.2.0",
+      "version": "@package_version@",
       "url": "https://github.com/zarraxx/package_builder/releases/download/compiler-@name@-@version@/compiler-@name@-@version@-@system_target@.tar.gz",
-      "filename": "@name@-@ver@.tar.gz"
-    },
-    {
-      "name": "loongarch64-gcc",
-      "version": "15.2.0",
-      "url": "https://github.com/zarraxx/package_builder/releases/download/compiler-@name@-@version@/compiler-@name@-@version@-@system_target@.tar.gz",
-      "filename": "@name@-@ver@.tar.gz"
+      "filename": "compiler-@name@-@ver@.tar.gz"
     }
+    ,{
+      "name": "loongarch64-gcc",
+      "version": "@package_version@",
+      "url": "https://github.com/zarraxx/package_builder/releases/download/compiler-@name@-@version@/compiler-@name@-@version@-@system_target@.tar.gz",
+      "filename": "compiler-@name@-@version@.tar.gz"
+    }
+    ,{
+      "name": "riscv64-gcc",
+      "version": "@package_version@",
+      "url": "https://github.com/zarraxx/package_builder/releases/download/compiler-@name@-@version@/compiler-@name@-@version@-@system_target@.tar.gz",
+      "filename": "compiler-@name@-@version@.tar.gz"
+    }
+    //https://github.com/zarraxx/package_builder/releases/download/compiler-riscv64-gcc-15.2.0/compiler-riscv64-gcc-15.2.0-linux-x86_64.tar.gz
+    //  ,{
+    //   "name": "llvm",
+    //   "version": "18.1.8",
+    //   "url": "https://github.com/zarraxx/package_builder/releases/download/compiler-@name@-@version@/compiler-@name@-@version@-@system_target@.tar.gz",
+    //   "filename": "@name@-@version@.tar.gz"
+    // },
+    // {
+    //   "name": "llvm.src",
+    //   "version": "18.1.8",
+    //   "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-@version@/llvm-project-@version@.src.tar.xz",
+    //   "filename": "llvm-project-@version@.src.tar.xz"
+    // }
+
   ]
 }
 

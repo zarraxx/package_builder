@@ -16,3 +16,13 @@ function(cache_set_default var_name var_type default_value doc_string)
 
     set(${var_name} "${_value}" CACHE ${var_type} "${doc_string}" FORCE)
 endfunction()
+
+function(append_module_path_if_exists dir)
+    if(EXISTS "${dir}" AND IS_DIRECTORY "${dir}")
+        list(FIND CMAKE_MODULE_PATH "${dir}" _idx)
+        if(_idx EQUAL -1)
+            list(APPEND CMAKE_MODULE_PATH "${dir}")
+            message(STATUS "Added to CMAKE_MODULE_PATH: ${dir}")
+        endif()
+    endif()
+endfunction()

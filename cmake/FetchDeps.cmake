@@ -1,6 +1,6 @@
 include_guard(GLOBAL)
 
-include(utils/CacheUtils)
+include(utils/BaseUtils)
 include(utils/BuildTimeUtils)
 include(SystemInfo)
 
@@ -32,6 +32,10 @@ function(_fd_render_template out_var template_text dep_name dep_ver sys_name sys
     string(REPLACE "@system_arch@" "${sys_arch}" _result "${_result}")
     string(REPLACE "@system_target@" "${sys_target}" _result "${_result}")
 
+    string(REPLACE "@system_target@" "${sys_target}" _result "${_result}")
+    string(REPLACE "@package_name@" "${MY_PACKAGE_NAME}" _result "${_result}")
+    string(REPLACE "@package_version@" "${MY_PACKAGE_VERSION}" _result "${_result}")
+
     # 兼容 ${xxx} 写法（可选）
     string(REPLACE "\${name}"         "${dep_name}" _result "${_result}")
     string(REPLACE "\${ver}"          "${dep_ver}"  _result "${_result}")
@@ -39,6 +43,9 @@ function(_fd_render_template out_var template_text dep_name dep_ver sys_name sys
     string(REPLACE "\${system_name}"  "${sys_name}" _result "${_result}")
     string(REPLACE "\${system_arch}"  "${sys_arch}" _result "${_result}")
     string(REPLACE "\${system_target}"  "${sys_target}" _result "${_result}")
+
+    string(REPLACE "\${package_name}"  "${MY_PACKAGE_NAME}" _result "${_result}")
+    string(REPLACE "\${package_version}"  "${MY_PACKAGE_VERSION}" _result "${_result}")
 
     set(${out_var} "${_result}" PARENT_SCOPE)
 endfunction()
@@ -62,19 +69,19 @@ function(_fd_add_one_fetch_rule dep_name dep_url dep_filename output_dir)
 endfunction()
 
 function(_fd_add_one_extract_rule dep_name archive_file extract_dir_root)
-    set(_stamp_dir    "${CMAKE_CURRENT_BINARY_DIR}/extract_stamps")
+    #set(_stamp_dir    "${CMAKE_CURRENT_BINARY_DIR}/extract_stamps")
     set(_archive_path "${FD_DOWNLOAD_DIR}/${archive_file}")
-    set(_dest_dir     "${extract_dir_root}/${dep_name}")
+    set(_dest_dir     "${extract_dir_root}")
 
     _fd_add_build_time_rule(
         TARGET_PREFIX extract_
         TARGET_NAME "${dep_name}"
-        STAMP_DIR "${_stamp_dir}"
+        #STAMP_DIR "${_stamp_dir}"
         SCRIPT "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/build_time/ExtractFile.cmake"
         COMMENT_TEXT "Extracting ${dep_name}"
         SCRIPT_ARGS
             -DARCHIVE=${_archive_path}
-            -DDESTINATION=${_dest_dir}
+            -DDESTINATION=${_dest_dir}/${dep_name}
             -DFD_FORCE_EXTRACT=${FD_FORCE_EXTRACT}
         EXTRA_DEPENDS
             "fetch_${dep_name}"
@@ -107,7 +114,7 @@ function(add_fetch_deps_target)
     cache_set_default(FD_DOWNLOAD_DIR PATH "${CMAKE_BINARY_DIR}/downloads"
     "Directory to store downloaded files")
 
-    cache_set_default(FD_EXTRACT_DIR PATH "${CMAKE_BINARY_DIR}/dependency"
+    cache_set_default(FD_EXTRACT_DIR PATH "${CMAKE_SOURCE_DIR}/dependency"
         "Directory to extract downloaded archives")
 
     cache_set_default(FD_FORCE_DOWNLOAD BOOL OFF
@@ -144,13 +151,15 @@ function(add_fetch_deps_target)
 
     foreach(i RANGE 0 ${_last})
         _fd_json_get(_name "${_json}" deps ${i} name)
-        _fd_json_get(_ver  "${_json}" deps ${i} version)
+        _fd_json_get(_ver_tpl  "${_json}" deps ${i} version)
         _fd_json_get(_url_tpl  "${_json}" deps ${i} url)
         _fd_json_get(_file_tpl "${_json}" deps ${i} filename)
 
         # 模板渲染
+        _fd_render_template(_ver  "${_ver_tpl}"  "${_name}" "" "${_sys_name}" "${_sys_arch}" "${_sys_target}" )
+        
         _fd_render_template(_url  "${_url_tpl}"  "${_name}" "${_ver}" "${_sys_name}" "${_sys_arch}" "${_sys_target}")
-        _fd_render_template(_file "${_file_tpl}" "${_name}" "${_ver}" "${_sys_name}" "${_sys_arch}" "${_sys_target}")
+        _fd_render_template(_file "${_file_tpl}" "${_name}" "${_ver}" "${_sys_name}" "${_sys_arch}" "${_sys_target}" )
 
         message(STATUS "dep: ${_name}")
         message(STATUS " url: ${_url}")

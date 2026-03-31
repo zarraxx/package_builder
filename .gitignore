@@ -28,7 +28,9 @@ out/
 build/
 dist/
 out/
+cache/
 archive/
+extracted/
 */.build/
 .build/
 build.log
