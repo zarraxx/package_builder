@@ -30,7 +30,7 @@ elif [ $VERSION == "gcc-12.5.0" ]; then
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "gcc-15.2.0" ]; then
     #TARGET='aarch64-unknown-linux-gnu-gcc15 x86_64-unknown-linux-gnu-gcc15 loongarch64-unknown-linux-gnu-gcc15 riscv64-unknown-linux-gnu-gcc15'
-    TARGET='aarch64-unknown-linux-gnu-gcc15 x86_64-unknown-linux-gnu-gcc15'
+    TARGET='aarch64-unknown-linux-gnu-gcc15 x86_64-unknown-linux-gnu-gcc15 loongarch64-unknown-linux-gnu-gcc15 riscv64-unknown-linux-gnu-gcc15 x86_64-w64-mingw32-gcc15'
     $ROOT/build_ctng.sh "$TARGET" "$ARCHIVE_DIR" "$BUILD_DIR" "$DEST_DIR" "$COMMAND"
 elif [ $VERSION == "loongarch64-gcc-15.2.0" ]; then
     TARGET='loongarch64-unknown-linux-gnu-gcc15'
