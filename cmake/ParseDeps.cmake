@@ -76,6 +76,7 @@ function(_fd_render_template out_var template_text dep_name dep_ver sys_name sys
 
     string(REPLACE "\${package_name}"  "${MY_PACKAGE_NAME}" _result "${_result}")
     string(REPLACE "\${package_version}"  "${MY_PACKAGE_VERSION}" _result "${_result}")
+    string(REPLACE "\${host_triple}"  "${MY_HOST_TRIPLE}" _result "${_result}")
 
     set(${out_var} "${_result}" PARENT_SCOPE)
 endfunction()
@@ -150,5 +151,5 @@ function(parse_dependencies_file)
         message(STATUS " ADD PROPERTY: FD_DEPEND_EXTRACT_DIR_${_name_var} -> ${_dep_extract_dir}  ")
 
     endforeach()
-    
+
 endfunction()

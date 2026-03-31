@@ -36,16 +36,19 @@ jobs:
         run: |
           mkdir -p ~/archive
           ./build.sh ${{ inputs.package }} ${{ inputs.version }} source ~/archive ~/dist/
-      - name: Package 
+      - name: Target Package 
         run: |
-          mkdir -p ~/archive
           ./build.sh ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/
-          ls -lah ~/dist/archives/*.tar.xz
+          ls -lah ~/dist/archives/*.tar.*
+      - name: Multi Package 
+        run: |
+          ./merge_package.sh ~/dist/archives/ ~/dist/${{ inputs.package }}-${{ inputs.version }}-linux.tar.xz
+          ls -lah ~/dist/archives/*.tar.*
       - name: Upload archives
         uses: actions/upload-artifact@v6
         with:
           name: sysroot-archives
-          path: ~/dist/archives/*.tar.xz
+          path: ~/dist/archives/*.tar.*
           if-no-files-found: error
           retention-days: 2
 

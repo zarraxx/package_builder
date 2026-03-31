@@ -12,8 +12,13 @@ if(NOT MY_PACKAGE_NAME)
 endif(NOT MY_PACKAGE_NAME)
 
 if(NOT MY_PACKAGE_VERSION)
-    set (MY_PACKAGE_VERSION "15.2.0")
+    set (MY_PACKAGE_VERSION "18.1.8")
 endif(NOT MY_PACKAGE_VERSION)
+
+if(NOT MY_HOST_TRIPLE)
+    system_arch(_sys_arch)
+    set (MY_HOST_TRIPLE "${_sys_arch}-unknown-linux-gnu")
+endif(NOT MY_HOST_TRIPLE)
 
 message(STATUS "Project name = ${PROJECT_NAME}")
 
@@ -53,21 +58,6 @@ if(NOT SUPPORTED_TARGETS)
         riscv64-unknown-linux-gnu
     )
 endif(NOT SUPPORTED_TARGETS)
-
-# foreach(_target ${SUPPORTED_TARGETS})
-#     message(STATUS "TARGET:${_target}")
-
-#     target_for_var_name(_target_var "${_target}")
-#     set(_toolchain_var "TOOLCHAIN_ROOT_${_target_var}")
-    
-#     find_toolchain_for_target(${_toolchain_var}
-#       "${TOOLCHAIN_SEARCH_ROOT}"
-#       "${_target}"
-#       GCC_VERSION 15.2.0
-#     )
-
-#     message(STATUS "find ${_target} TOOLCHAIN_ROOT: ${${_toolchain_var}}")
-# endforeach()
 
 
 add_package_sysroots_target(
