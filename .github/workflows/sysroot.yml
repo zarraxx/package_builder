@@ -42,7 +42,7 @@ jobs:
           ls -lah ~/dist/archives/*.tar.*
       - name: Multi Package 
         run: |
-          ./merge_package.sh ~/dist/archives/ ~/dist/${{ inputs.package }}-${{ inputs.version }}-linux.tar.xz
+          ./merge_package.sh ~/dist/archives/ ~/dist/archives/${{ inputs.package }}-${{ inputs.version }}-linux.tar.xz
           ls -lah ~/dist/archives/*.tar.*
       - name: Upload archives
         uses: actions/upload-artifact@v6
