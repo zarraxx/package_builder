@@ -35,16 +35,17 @@ jobs:
       - name: Fetch 
         run: |
           mkdir -p ~/archive
-          ./build.sh ${{ inputs.package }} ${{ inputs.version }} source
+          ./build.sh ${{ inputs.package }} ${{ inputs.version }} source ~/archive ~/dist/
       - name: Package 
         run: |
           mkdir -p ~/archive
-          ./build.sh ${{ inputs.package }} ${{ inputs.version }} build
+          ./build.sh ${{ inputs.package }} ${{ inputs.version }} build ~/archive ~/dist/
+          ls -lah ~/dist/archives/*.tar.xz
       - name: Upload archives
         uses: actions/upload-artifact@v6
         with:
           name: sysroot-archives
-          path: ./dist/archives/*.tar.xz
+          path: ~/dist/archives/*.tar.xz
 
 
   publish-release:
