@@ -1,4 +1,4 @@
-name: Build Rootfs
+name: Build Sysroot
 
 on:
   workflow_dispatch: # 开启手动触发
@@ -8,7 +8,7 @@ on:
         required: true
         type: choice
         options:
-          - rootfs
+          - sysroot
 
       version:
         description: '构建版本'

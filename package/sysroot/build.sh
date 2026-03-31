@@ -3,7 +3,7 @@ set -xe
 ROOT=$(cd `dirname $0` && pwd)
 
 
-export PACKAGE="${GLOBAL_PACKAGE:-"rootfs"}"
+export PACKAGE="${GLOBAL_PACKAGE:-"sysroot"}"
 export PACKAGE_VERSION="${GLOBAL_VERSION:-"15.2.0"}"
 
 

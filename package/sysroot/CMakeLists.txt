@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(rootfs NONE)
+project(sysroot NONE)
 include(MyPackageTools)
 
 #append_module_path_if_exists("${CMAKE_SOURCE_DIR}/cmake")
