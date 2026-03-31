@@ -32,7 +32,7 @@ fi
 if [ "$GLOBAL_COMMAND" == "build" ]; then
     cmake "${CMAKE_BASE_OPTIONS[@]}" -DPB_STAGE=configure \
     -DTOOLCHAIN_SEARCH_ROOT=${FD_EXTRACT_DIR} \
-    -DCMAKE_INSTALL_PREFIX=${GLOBAL_DEST_DIR}
+    -DCMAKE_INSTALL_PREFIX=${GLOBAL_DEST_DIR} 
 
     cmake --build $BUILD_DIR --target package_sysroots 
     cmake --install $BUILD_DIR  

@@ -26,6 +26,7 @@ function(_sp_add_one_package_rule target_triple toolchain_root output_dir)
             -DWORKING_DIR=${_working_dir}
             -DINPUT_DIR_NAME=${_input_dir_name}
             -DOUT=${_archive_path}
+            -DCREATE_ARCHIVE_SCRIPT=${CMAKE_CURRENT_FUNCTION_LIST_DIR}/build_time/CreateArchive.cmake
             -DFD_FORCE_PACKAGE=${FD_FORCE_PACKAGE}
     )
 

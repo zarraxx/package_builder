@@ -14,10 +14,15 @@ if(NOT DEFINED STAMP OR STAMP STREQUAL "")
     message(FATAL_ERROR "STAMP is not defined")
 endif()
 
+if(NOT DEFINED CREATE_ARCHIVE_SCRIPT OR CREATE_ARCHIVE_SCRIPT STREQUAL "")
+    message(FATAL_ERROR "CREATE_ARCHIVE_SCRIPT is not defined")
+endif()
+
 string(REGEX REPLACE "^\"(.*)\"$" "\\1" WORKING_DIR "${WORKING_DIR}")
 string(REGEX REPLACE "^\"(.*)\"$" "\\1" INPUT_DIR_NAME "${INPUT_DIR_NAME}")
 string(REGEX REPLACE "^\"(.*)\"$" "\\1" OUT "${OUT}")
 string(REGEX REPLACE "^\"(.*)\"$" "\\1" STAMP "${STAMP}")
+string(REGEX REPLACE "^\"(.*)\"$" "\\1" CREATE_ARCHIVE_SCRIPT "${CREATE_ARCHIVE_SCRIPT}")
 
 if(NOT DEFINED FD_FORCE_PACKAGE OR FD_FORCE_PACKAGE STREQUAL "")
     set(FD_FORCE_PACKAGE OFF)
@@ -51,15 +56,9 @@ endif()
 
 file(REMOVE "${OUT}")
 
-# CMake 3.20 的 file(ARCHIVE_CREATE) 没有 WORKING_DIRECTORY，
-# 所以先构造一个临时 staging 目录：
-#
-#   <staging>/sysroot/...
-#
-# 再把 staging 下的 sysroot 打成 tar.xz
 get_filename_component(_stamp_dir "${STAMP}" DIRECTORY)
-set(_staging_dir "${_stamp_dir}/package_stage")
-set(_archive_root "${_staging_dir}/sysroot")
+get_filename_component(_stamp_name_we "${STAMP}" NAME_WE)
+set(_staging_dir "${_stamp_dir}/package_stage_${_stamp_name_we}")
 
 file(REMOVE_RECURSE "${_staging_dir}")
 file(MAKE_DIRECTORY "${_staging_dir}")
@@ -69,16 +68,21 @@ message(STATUS "  WORKING_DIR: ${WORKING_DIR}")
 message(STATUS "  INPUT_DIR:   ${INPUT_DIR_NAME}")
 message(STATUS "  OUT:         ${OUT}")
 
-# 复制成 staging/sysroot
+# staging_dir/sysroot
 file(COPY "${_input_path}" DESTINATION "${_staging_dir}")
 
-# 这里 PATHS 直接用 staging 下的绝对路径
-file(ARCHIVE_CREATE
-    OUTPUT "${OUT}"
-    PATHS "${_archive_root}"
-    FORMAT gnutar
-    COMPRESSION XZ
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E chdir "${_staging_dir}"
+            ${CMAKE_COMMAND}
+            -DOUT=${OUT}
+            -DINPUT_DIR_NAME=${INPUT_DIR_NAME}
+            -P "${CREATE_ARCHIVE_SCRIPT}"
+    RESULT_VARIABLE _rc
 )
+
+if(NOT _rc EQUAL 0)
+    message(FATAL_ERROR "Archive creation failed: ${OUT}")
+endif()
 
 file(REMOVE_RECURSE "${_staging_dir}")
 file(WRITE "${STAMP}" "ok\n")
