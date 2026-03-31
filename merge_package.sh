@@ -8,13 +8,15 @@ set -euox pipefail
 #   ./merge-package.sh ./archives ./sysroot-15.2.0-multi-linux-gnu.tar.xz
 
 INPUT_DIR="${1:?missing input dir}"
-OUTPUT_TAR="${2:?missing output tar}"
+OUTPUT_DIR="${2:?missing output dir}"
+FILE_NAME_PREFIX="${3:?missing output tar file name}"
 
 TMP_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
 echo "INPUT_DIR  = $INPUT_DIR"
-echo "OUTPUT_TAR = $OUTPUT_TAR"
+echo "OUTPUT_DIR = $OUTPUT_DIR"
+echo "FILE_NAME_PREFIX = $FILE_NAME_PREFIX"
 echo "TMP_ROOT   = $TMP_ROOT"
 
 shopt -s nullglob
@@ -46,7 +48,7 @@ for tarfile in "$INPUT_DIR"/*.tar "$INPUT_DIR"/*.tar.gz "$INPUT_DIR"/*.tar.xz "$
         continue
     fi
 
-    dest="$TMP_ROOT/${arch}-unknown-linux-gnu"
+    dest="$TMP_ROOT/${FILE_NAME_PREFIX}/${arch}-unknown-linux-gnu"
     mkdir -p "$dest"
 
     echo "extract: $tarfile -> $dest"
@@ -59,12 +61,11 @@ if [[ "$found_any" -eq 0 ]]; then
 fi
 
 # 打总包：包内顶层是各个 arch 目录
-parent_dir="$(dirname "$OUTPUT_TAR")"
-mkdir -p "$parent_dir"
+#parent_dir="$(dirname "$OUTPUT_TAR")"
+mkdir -p "$OUTPUT_DIR"
 
-echo "pack multi archive: $OUTPUT_TAR"
+echo "pack multi archive: $OUTPUT_DIR/$FILE_NAME_PREFIX-linux.tar.xz"
 #cd "$TMP_ROOT"
-ALL_FILES=("$TMP_ROOT"/*)
-tar caf "$OUTPUT_TAR" -C "$TMP_ROOT" "${ALL_FILES[@]}"
+tar caf "$OUTPUT_DIR/$FILE_NAME_PREFIX-linux.tar.xz" -C "$TMP_ROOT" "$FILE_NAME_PREFIX"
 
-echo "done: $OUTPUT_TAR"
+echo "done: $OUTPUT_DIR/$FILE_NAME_PREFIX-linux.tar.xz"
