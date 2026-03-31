@@ -41,7 +41,7 @@ jobs:
           mkdir -p ~/archive
           ./build.sh ${{ inputs.package }} ${{ inputs.version }} build
       - name: Upload archives
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sysroot-archives
           path: ./dist/archives/*.tar.xz
