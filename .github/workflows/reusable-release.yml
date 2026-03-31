@@ -37,7 +37,7 @@ jobs:
       - name: Prepare assets
         run: |
           mkdir -p upload-dir
-          find all-dist -name "*.tar.gz" -exec cp {} upload-dir/ \;
+          find all-dist -name "*.tar.*" -exec cp {} upload-dir/ \;
 
       - name: Publish Release
         uses: ncipollo/release-action@v1
