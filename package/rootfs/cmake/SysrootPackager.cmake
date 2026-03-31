@@ -11,7 +11,7 @@ function(_sp_add_one_package_rule target_triple toolchain_root output_dir)
 
     target_for_var_name(_target_norm "${target_triple}")
     set(_pkg_target "${_target_norm}")
-    set(_archive_name "sysroot-${target_triple}.tar.xz")
+    set(_archive_name "${MY_PACKAGE_NAME}-${MY_PACKAGE_VERSION}-${target_triple}.tar.xz")
     set(_archive_path "${output_dir}/${_archive_name}")
 
     set(_working_dir "${toolchain_root}/${target_triple}")
