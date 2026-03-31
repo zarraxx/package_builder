@@ -34,10 +34,12 @@ jobs:
       - uses: actions/checkout@v5
       - name: Fetch 
         run: |
+          mkdir -p ~/archive
           ls -lah ~/archive
           ./build.sh ${{ inputs.package }} ${{ inputs.version }} source
       - name: Package 
         run: |
+          mkdir -p ~/archive
           ls -lah ~/archive
           ./build.sh ${{ inputs.package }} ${{ inputs.version }} build
       - name: Upload archives
