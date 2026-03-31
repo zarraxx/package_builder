@@ -46,7 +46,7 @@ jobs:
           tag: ${{ inputs.tag_name || format('{0}-{1}', inputs.package, inputs.version) }}
           name: ${{ inputs.package }}-${{ inputs.version }}
           body: ${{ inputs.deploy-body }}
-          artifacts: "upload-dir/*.tar.gz"
+          artifacts: "upload-dir/*.tar.*"
           allowUpdates: true
           replacesArtifacts: true
           makeLatest: true

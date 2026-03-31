@@ -46,6 +46,8 @@ jobs:
         with:
           name: sysroot-archives
           path: ~/dist/archives/*.tar.xz
+          if-no-files-found: error
+          retention-days: 2
 
 
   publish-release:
